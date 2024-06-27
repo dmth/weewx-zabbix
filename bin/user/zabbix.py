@@ -46,6 +46,8 @@ class Zabbix(weewx.engine.StdService):
         self.prefix = conf.get('prefix', 'weewx_')
         self.server = conf.get('server', '127.0.0.1')
         self.host = conf.get('host', 'weewx-host')
+        self.replacenones = conf.get('replacenones', True)
+        # replacenones determines wheter an empty string is send, or the NoneType-Value.
 
         log.debug("self.enable=" + str(self.enable))
         log.debug("self.zabbix_sender=" + self.zabbix_sender)
@@ -54,12 +56,16 @@ class Zabbix(weewx.engine.StdService):
         log.debug("self.host=" + self.host)
 
         if self.enable:
-	        self.bind(weewx.NEW_LOOP_PACKET, self.loop)
+            self.bind(weewx.NEW_LOOP_PACKET, self.loop)
 
     def loop(self, event):
         log.debug("loop data:")
         s = ""
         for key,value in event.packet.items():
+            if self.replacenones and (value is None):
+                log.debug("Replacing NoneType with empty string: "+self.prefix+key + ": " + str(value))
+                value = ""
+            log.debug(self.prefix+key + ": " + str(value))
             l=self.host + " " + self.prefix+key + " " + str(value) + "\n"
             s+=l
             log.debug(l)
@@ -68,4 +74,4 @@ class Zabbix(weewx.engine.StdService):
         log.debug("command line : " + str(c))
         p = Popen(c, stdout=PIPE, stdin=PIPE, stderr=STDOUT)
         sender_stdout = p.communicate(input=s.encode())[0]
-        log.debug(self.zabbix_sender + " result: " +sender_stdout.decode())
+        log.debug(self.zabbix_sender + " result: " + sender_stdout.decode())

@@ -44,7 +44,8 @@ class ZabbixInstaller(ExtensionInstaller):
                     'prefix': 'weewx_',
                     'server': '127.0.0.1',
                     'host': 'weewx-host',
-                    'send_interval': '0'
+                    'send_interval': '0',
+                    'replacenones': 'False'
                 },
             },
             files=[('bin/user', ['bin/user/zabbix.py'])]
