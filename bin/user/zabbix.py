@@ -64,7 +64,7 @@ class Zabbix(weewx.engine.StdService):
         for key,value in event.packet.items():
             if self.replacenones and (value is None):
                 log.debug("Replacing NoneType with empty string: "+self.prefix+key + ": " + str(value))
-                value = ""
+                value = '""'
             log.debug(self.prefix+key + ": " + str(value))
             l=self.host + " " + self.prefix+key + " " + str(value) + "\n"
             s+=l
